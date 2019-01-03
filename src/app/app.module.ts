@@ -1,6 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { NewTabComponent } from './tabs/newtab.component';
+
+
 import { TabsComponent } from './tabs/tabs.component';
 import { TabComponent } from './tabs/tab.component';
 import { DynamicTabsDirective } from './tabs/dynamic-tabs.directive';
@@ -16,6 +19,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     TabsComponent,
     TabComponent,
     DynamicTabsDirective,
+    NewTabComponent,
     PersonEditComponent,
     PeopleListComponent
   ],

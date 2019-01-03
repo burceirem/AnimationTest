@@ -14,6 +14,7 @@ import {
 } from '@angular/core';
 
 import { TabComponent } from './tab.component';
+import { NewTabComponent } from './newtab.component';
 import { DynamicTabsDirective } from './dynamic-tabs.directive';
 
 @Component({
@@ -21,20 +22,22 @@ import { DynamicTabsDirective } from './dynamic-tabs.directive';
   template: `
     <ul>
       <li *ngFor="let tab of tabs" (click)="selectTab(tab)" [class.active]="tab.active">
-        <a href="#">{{tab.title}}</a>
+        <a>{{tab.title}}</a>
       </li>
       <!-- dynamic tabs -->
       <li *ngFor="let tab of dynamicTabs" (click)="selectTab(tab)" [class.active]="tab.active">
-        <a href="#">{{tab.title}} <span class="tab-close" *ngIf="tab.isCloseable" (click)="closeTab(tab)">x</span></a>
+        <a>{{tab.title}} <span class="tab-close" *ngIf="tab.isCloseable" (click)="closeTab(tab)">x</span></a>
       </li>
     </ul>
+
     <ng-content></ng-content>
+
     <ng-template dynamic-tabs #container></ng-template>
   `,
   styles: [
     `
     .tab-close {
-      color: gray;
+      color: grey;
       text-align: right;
       cursor: pointer;
     }
@@ -49,8 +52,9 @@ import { DynamicTabsDirective } from './dynamic-tabs.directive';
       border : 1px;
       width:100px;
       height:40px;
-      background-color: 	#dddddd;
+      background-color:#dddddd;
       padding:10px;
+      border-radius: 5px; 
 
     }
 
@@ -82,21 +86,25 @@ import { DynamicTabsDirective } from './dynamic-tabs.directive';
   ]
 })
 export class TabsComponent implements AfterContentInit {
+
   dynamicTabs: TabComponent[] = [];
-
   @ContentChildren(TabComponent) tabs: QueryList<TabComponent>;
-
   @ViewChild(DynamicTabsDirective) dynamicTabPlaceholder: DynamicTabsDirective;
 
-  /*
-    Alternative approach of using an anchor directive
-    would be to simply get hold of a template variable
-    as follows
-  */
-  // @ViewChild('container', {read: ViewContainerRef}) dynamicTabPlaceholder;
+  
 
   constructor(private _componentFactoryResolver: ComponentFactoryResolver) {}
 
+
+
+
+
+
+
+
+
+
+  
   // contentChildren are set
   ngAfterContentInit() {
     // get all active tabs
@@ -109,65 +117,75 @@ export class TabsComponent implements AfterContentInit {
   }
 
   openTab(title: string, template, data, isCloseable = false) {
-    // get a component factory for our TabComponent
+  
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(
       TabComponent
     );
 
-    // fetch the view container reference from our anchor directive
+    
     const viewContainerRef = this.dynamicTabPlaceholder.viewContainer;
-
-    // alternatively...
-    // let viewContainerRef = this.dynamicTabPlaceholder;
-
-    // create a component instance
     const componentRef = viewContainerRef.createComponent(componentFactory);
 
-    // set the according properties on our component instance
-    const instance: TabComponent = componentRef.instance as TabComponent;
+    
+    const instance: NewTabComponent = componentRef.instance as NewTabComponent;
     instance.title = title;
     instance.template = template;
     instance.dataContext = data;
     instance.isCloseable = isCloseable;
-
-    // remember the dynamic component for rendering the
-    // tab navigation headers
-    this.dynamicTabs.push(componentRef.instance as TabComponent);
-
-    // set it active
+   // instance.isPinned=true;
+    
+    this.dynamicTabs.push(componentRef.instance as NewTabComponent);
     this.selectTab(this.dynamicTabs[this.dynamicTabs.length - 1]);
+
+
   }
+
+
 
   selectTab(tab: TabComponent) {
-    // deactivate all tabs
+  
     this.tabs.toArray().forEach(tab => (tab.active = false));
     this.dynamicTabs.forEach(tab => (tab.active = false));
-
-    // activate the tab the user has clicked on.
     tab.active = true;
+
   }
 
-  closeTab(tab: TabComponent) {
-    for (let i = 0; i < this.dynamicTabs.length; i++) {
-      if (this.dynamicTabs[i] === tab) {
-        // remove the tab from our array
-        this.dynamicTabs.splice(i, 1);
-    
-        // destroy our dynamically created component again
-        let viewContainerRef = this.dynamicTabPlaceholder.viewContainer;
-        // let viewContainerRef = this.dynamicTabPlaceholder;
-        viewContainerRef.remove(i);
-
-        // set tab index to 1st one
-        this.selectTab(this.tabs.first);
+  selectTabByIndex( index:number){
+    for(let i=0; i<this.dynamicTabs.length;i++) {
+      if (index == i) {
+        this.selectTab(this.dynamicTabs[i]);
         break;
       }
     }
   }
 
+  closeTab(tab: TabComponent) {
+    for (let i = 0; i < this.dynamicTabs.length; i++) {
+      if (this.dynamicTabs[i] === tab) {
+        this.dynamicTabs.splice(i, 1);
+        let viewContainerRef = this.dynamicTabPlaceholder.viewContainer;
+        viewContainerRef.remove(i);
+  
+     if(i == this.dynamicTabs.length && i == 0 )
+     {
+       this.selectTabByIndex(i);
+        break;
+      }
+      if  (i == 0 ){
+        this.selectTabByIndex(this.dynamicTabs.length-1);
+        break;
+      }
+      else  {
+        this.selectTabByIndex(this.dynamicTabs.length-1);
+        break;
+      } 
+     }
+    }
+  }
+
   closeActiveTab() {
     const activeTabs = this.dynamicTabs.filter(tab => tab.active);
-      // close the 1st active tab (should only be one at a time)
+
     if (activeTabs.length > 0) {
       this.closeTab(activeTabs[0]);
     }

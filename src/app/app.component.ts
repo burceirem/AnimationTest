@@ -14,16 +14,11 @@ import { TabsComponent } from './tabs/tabs.component';
   <my-tabs></my-tabs>
   
 
-
-  <ng-template let-person="person" #personEdit>
-    <person-edit [person]="person" (savePerson)="onPersonFormSubmit($event)"></person-edit>
-  </ng-template>
-
   <ng-template #collection>
-      <div id="collection" class="contents" style = "height:400px; width:1200px;" >
+      <div id="collection" class="contents">
         <div class="head">
           <h3 id="head">Tahsilat</h3>
-          <button id="collection" (click)="onOpenCollectionNew($event)"  > XX </button>
+          <button id="collection" (click)="resizeTab($event)"> XX </button>
         </div>
         <div class="row">
           <div id="table">b</div>
@@ -36,8 +31,6 @@ import { TabsComponent } from './tabs/tabs.component';
     </div>
    
   </ng-template>
-
-
 
   <ng-template #credit>
       <div id="credit" class="contents">
@@ -55,7 +48,6 @@ import { TabsComponent } from './tabs/tabs.component';
       </div>
     </div>
   </ng-template>
-
 
   <ng-template #protocol>
     <div id="protocol" class="contents">
@@ -75,21 +67,8 @@ import { TabsComponent } from './tabs/tabs.component';
   </div>
   </ng-template> 
 
-  
-  <ng-template #collectionnew>
-    <div id="collectionnew" class="contents" >
-      <div class="row" style="height:150px; width:450px; ">
-        <div id="table">bir</div>
-        <div id="table">bir</div>
-        <div id="table">bir</div>
-        <div id="table">bir</div>
-        <div id="table"></div>
-        <div id="table"></div>
-      </div>
-    </div>
-  </ng-template>
-
   `,
+ 
   styles: [
      `
   div {
@@ -111,86 +90,38 @@ import { TabsComponent } from './tabs/tabs.component';
     height:500px;
     width:1000px;
   }
-  #protocol{
 
-    background-color:grey;
+  .contents{
+    border: 1px;
+    border-radius: 5px;
+    background-color: #f7f7f7;
+    margin:10px;
   }
-  #credit{
-
-    background-color:grey;
-  }
-  #collection{
-
-    background-color:grey;
-  }
-  #collectionhidden{
-    background-color:blue;
+  .resizetab{
+    float: right;
+    margin-top: -40px;
   }
 
   `
   ]
 })
 export class AppComponent {
-  @ViewChild('personEdit') editPersonTemplate;
-  @ViewChild('about') aboutTemplate;
+ 
+
   @ViewChild('protocol') protocolTemplate;
   @ViewChild('credit') creditTemplate;
   @ViewChild('collection') collectionTemplate;
-  @ViewChild('collectionnew') collectionTemplateNew;
+
+
   @ViewChild(TabsComponent) tabsComponent;
 
-  people = [
-    {
-      id: 1,
-      name: 'Juri',
-      surname: 'Strumpflohner',
-      twitter: '@juristr'
-    }
-  ];
 
-  onEditPerson(person) {
-    this.tabsComponent.openTab(
-      `Editing ${person.name}`,
-      this.editPersonTemplate,
-      person,
-      true
-    );
-  }
-
-  onAddPerson() {
-    this.tabsComponent.openTab('New Person', this.editPersonTemplate, {}, true);
-  }
-
-  onPersonFormSubmit(dataModel) {
-    if (dataModel.id > 0) {
-      this.people = this.people.map(person => {
-        if (person.id === dataModel.id) {
-          return dataModel;
-        } else {
-          return person;
-        }
-      });
-    } else {
-      // create a new one
-      dataModel.id = Math.round(Math.random() * 100);
-      this.people.push(dataModel);
-    }
-
-    // close the tab
-    this.tabsComponent.closeActiveTab();
-  }
-
-  onOpenAbout() {
-    this.tabsComponent.openTab('About', this.aboutTemplate, {}, true);
-  }
+ 
   onOpenCollection()
   {
     this.tabsComponent.openTab('Collection', this.collectionTemplate, {}, true);
   }
-  onOpenCollectionNew()
-  {
-    this.tabsComponent.openTab('Collectionnew', this.collectionTemplateNew, {}, true);
-  }
+  
   onOpenCredit()
   {
     this.tabsComponent.openTab('Credit', this.creditTemplate, {}, true);
@@ -211,34 +142,31 @@ export class AppComponent {
     );
     }
 
-    
-    
+      
   resizeTab(event){
-
+    console.log("brc");
+   
     var target = event.target || event.srcElement || event.currentTarget;
     var idAttr = target.attributes.id;
-    var value = idAttr.nodeValue;
-    console.log(value);
+    var value = idAttr.nodeValue; 
     var element = document.getElementById(value);
     element.style.width="400px";
-    var brc=value+"hidden";
-    console.log(brc);
-
-      var x = document.getElementById(brc);
-
-      if (x.style.display === "none") {
-        x.style.display = "block";
-      } else {
-      x.style.display = "none";
-      x.style.cssFloat="left";
-      x.style.backgroundColor="blue";
-     }
+    element.style.height="100px";
+    this.tabsComponent.dynamicTabs[0].isPinned=true;
+    
+    console.log(this.tabsComponent.dynamicTabs[0].isPinned);
+    // var newdiv = document.createElement("div");
+    // var t = document.createTextNode("This is a paragraph.");
+    // newdiv.appendChild(t);
+    // document.body.appendChild(newdiv);
+    // newdiv.style.marginTop="-580px";
+    // newdiv.style.marginLeft="580px";
+  
+    }
     
     }
-
-
-
-  }
+   
+ 
   
 
     
